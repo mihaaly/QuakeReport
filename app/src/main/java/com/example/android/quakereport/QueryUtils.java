@@ -34,6 +34,18 @@ public final class QueryUtils {
     }
 
     public static ArrayList<Earthquake> fetchData(String urlString) {
+
+//        // To force the background thread to sleep for 2 seconds, we are temporarily simulating a
+//        // very slow network response time. That allows us to see the loading spinner on the screen
+//        // for a little longer than it normally would appear for. If you try to add the
+//        // Thread.sleep(2000); method call by itself, Android Studio will complain that there is
+//        // an uncaught exception, so we need to surround that statement with a try/catch block.
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         Log.i(LOG_TAG, "TEST: fetchData");
         URL url = createUrl(urlString);
         String jsonResponse = null;

@@ -52,6 +52,7 @@ public class EarthquakeActivity extends AppCompatActivity implements
     private TextView mEmptyStateTextView;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,8 +117,12 @@ public class EarthquakeActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<ArrayList<Earthquake>> loader, ArrayList<Earthquake> earthquakes) {
         Log.i(LOG_TAG, "TEST: onLoadFinished");
+        View loadingSpinner = findViewById(R.id.loading_spinner);
+        loadingSpinner.setVisibility(View.GONE);
+
         // Set empty state text to display "No earthquakes found."
         mEmptyStateTextView.setText(R.string.no_earthquakes);
+
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
 
@@ -126,6 +131,8 @@ public class EarthquakeActivity extends AppCompatActivity implements
         if (earthquakes != null && !earthquakes.isEmpty()) {
             mAdapter.addAll(earthquakes);
         }
+
+
     }
 
     @Override
