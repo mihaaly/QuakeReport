@@ -19,4 +19,33 @@
     <string name="no_earthquakes">No earthquakes found.</string>
     <!-- Text to display in the list when there is no internet connection [CHAR LIMIT=NONE] -->
     <string name="no_internet">No internet connection.</string>
+
+    <!-- Settings Menu Item [CHAR LIMIT=NONE] -->
+    <string name="settings_menu_item">Settings</string>
+    <!-- Settings Activity Title [CHAR LIMIT=NONE] -->
+    <string name="settings_title">Earthquake Settings</string>
+
+    <!-- Strings For Minimum Magnitude Preference [CHAR LIMIT=30] -->
+    <string name="settings_min_magnitude_label">Minimum Magnitude</string>
+    <string name="settings_min_magnitude_key" translatable="false">min_magnitude</string>
+    <string name="settings_min_magnitude_default" translatable="false">3</string>
+
+
+    <!-- Strings For Order-By Preference [CHAR LIMIT=30] -->
+    <!-- displayed on the settings screen -->
+    <string name="settings_order_by_label">Order By</string>
+    <!-- "order by" key for storing SharedPreferences of the setting-->
+    <string name="settings_order_by_key" translatable="false">order_by</string>
+    <!-- default value of the key-->
+    <string name="settings_order_by_default" translatable="false">@string/settings_order_by_most_recent_value</string>
+
+    <!-- Label for order-by magnitude option  - displayed in the settings screen's ListPreference [CHAR LIMIT=20] -->
+    <string name="settings_order_by_magnitude_label">Magnitude</string>
+    <!-- value 1 of the "order by" JSON parameter -->
+    <string name="settings_order_by_magnitude_value" translatable="false">magnitude</string>
+
+    <!-- Label for order-by most recent option - displayed in the settings screen's ListPreference [CHAR LIMIT=20] -->
+    <string name="settings_order_by_most_recent_label">Most Recent</string>
+    <!-- value 2 of the "order by" JSON parameter -->
+    <string name="settings_order_by_most_recent_value" translatable="false">time</string>
 </resources>

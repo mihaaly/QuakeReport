@@ -19,12 +19,16 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -45,12 +49,17 @@ public class EarthquakeActivity extends AppCompatActivity implements
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
     /**
-     * Sample JSON response for a USGS query
+     * Base USGS query URL
+     *  However, now we need to insert our preference for minimum earthquake magnitude into the URL
+     *  as a query parameter. We could do this with some tricky string concatenation, but there's a
+     *  better way using the Uri.Builder class.
      */
-    private static final String SAMPLE_JSON_RESPONSE =
-            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=3&limit=100";
+    private static final String USGS_REQUEST_URL =
+            // ?format=geojson&eventtype=earthquake&orderby=time&minmag=3&limit=100
+            "https://earthquake.usgs.gov/fdsnws/event/1/query";
 
     private EarthquakeAdapter mAdapter;
+
     /** TextView that is displayed when the list is empty */
     private TextView mEmptyStateTextView;
 
@@ -80,7 +89,6 @@ public class EarthquakeActivity extends AppCompatActivity implements
 
         // If there is a network connection, fetch data
         if (activeNetwork != null && activeNetwork.isConnected()) {
-
             // Get a reference to the LoaderManager, in order to interact with loaders.
             LoaderManager loaderManager = getLoaderManager();
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
@@ -96,13 +104,6 @@ public class EarthquakeActivity extends AppCompatActivity implements
             // Update empty state with no connection error message
             mEmptyStateTextView.setText(R.string.no_internet);
         }
-
-
-
-
-
-
-
 
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -132,11 +133,68 @@ public class EarthquakeActivity extends AppCompatActivity implements
 
     }
 
+    /**
+     * And override a couple methods in EarthquakeActivity.java to inflate the menu,
+     * and respond when users click on our menu item:
+     * @param menu
+     * @return
+     */
+    // creates menu item
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    // when clicked SettingsActivity ( has a PreferenceFragment) with
+    // settings_activity.xml (has a fragment) opens up
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Then we can replace the body of onCreateLoader() method to read the user’s latest preferences
+     * for the minimum magnitude, construct a proper URI with their preference, and then create a new
+     * Loader for that URI.
+     * @param i
+     * @param bundle
+     * @return
+     */
     @Override
     public Loader<ArrayList<Earthquake>> onCreateLoader(int i, Bundle bundle) {
         Log.i(LOG_TAG, "TEST: onCreateLoader");
-        return new EarthquakeLoader(EarthquakeActivity.this, SAMPLE_JSON_RESPONSE);
+        // get the preferences' values to update query URL
+        // cf. SettingsActivity bindPreferenceSummaryToValue(Preference preference)
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // preference for min. magnitude
+        String minMagnitude = sharedPrefs.getString(
+                getString(R.string.settings_min_magnitude_key),
+                getString(R.string.settings_min_magnitude_default)
+        );
+        // preference for order the list of earthquakes by
+        String orderBy = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default)
+        );
 
+        // create base Uri
+        Uri baseUri = Uri.parse(USGS_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        // add query parameters
+        uriBuilder.appendQueryParameter("format", "geojson");
+        uriBuilder.appendQueryParameter("limit", "100");
+        uriBuilder.appendQueryParameter("minmag", minMagnitude);
+        uriBuilder.appendQueryParameter("orderby", orderBy);
+
+        return new EarthquakeLoader(this, uriBuilder.toString());
     }
 
     @Override
